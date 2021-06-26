@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fullstack-app-postgres
+  labels:
+    app: fullstack-app-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fullstack-app-postgres
+  template:
+    metadata:
+      labels:
+        app: fullstack-app-postgres
+    spec:
+      containers:
+        - name: fullstack-app-postgres
+          image: 401600449738.dkr.ecr.ap-southeast-1.amazonaws.com/go-sample:v1
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fullstack-app-postgres
+  labels:
+    app: fullstack-app-postgres
+spec:
+  type: LoadBalancer
+  selector:
+    app: fullstack-app-postgres
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
